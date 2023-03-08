@@ -236,14 +236,12 @@ export class Telegraf<C extends Context = Context> extends Composer<C> {
     this.webhookServer =
       tlsOptions != null
         ? https.createServer(tlsOptions, callback)
-        : http.createServer(callback)
-    try {
-      this.webhookServer?.listen(port, host, () => {
-        debug('Webhook listening on port: %s', port)
-      })
-    } catch (error) {
-      console.error('Webhook server listener error occurred')
-    }
+        : http.createServer(callback).on('error', (error) => {
+            console.error(`Webhook listen port error occurred: ${error}`)
+          })
+    this.webhookServer?.listen(port, host, () => {
+      debug('Webhook listening on port: %s', port)
+    })
     return this
   }
 
